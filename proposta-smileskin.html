@@ -38,7 +38,7 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
   body {
     background: var(--ink);
@@ -48,6 +48,7 @@
     font-size: 15px;
     line-height: 1.7;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
 
   body::before {
@@ -134,6 +135,7 @@
     filter: blur(120px);
     pointer-events: none;
     z-index: 0;
+    max-width: 100vw;
   }
   .glow-gold { background: radial-gradient(circle, rgba(201,168,76,.14) 0%, transparent 70%); }
   .glow-rose { background: radial-gradient(circle, rgba(212,134,154,.10) 0%, transparent 70%); }
@@ -560,21 +562,19 @@
 
   .kanban-board {
     display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    gap: 10px;
     padding-bottom: 4px;
   }
-  .kanban-board::-webkit-scrollbar { display: none; }
 
   .kanban-col {
-    flex: 0 0 200px;
+    flex: 1 1 0;
+    min-width: 0;
     border: 1px solid var(--border-subtle);
     border-radius: var(--r-md);
     background: rgba(255,255,255,0.02);
     padding: 12px 10px;
     position: relative;
-    min-height: 160px;
+    min-height: 140px;
   }
 
   .kanban-col-title {
@@ -605,7 +605,7 @@
     margin-bottom: 6px;
   }
 
-  /* Animated card — pixel offsets: col 200px + gap 12px = 212px step */
+  /* Animated card — JS will set actual pixel values */
   .kcard-live {
     background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.05));
     border: 1px solid rgba(201,168,76,.4);
@@ -614,7 +614,7 @@
     margin-bottom: 6px;
     position: relative;
     box-shadow: 0 4px 16px rgba(201,168,76,.08);
-    animation: card-travel 7s ease-in-out infinite;
+    /* animation set by JS for responsive pixel values */
   }
   .kcard-live .kname {
     font-size: 11px; font-weight: 500;
@@ -636,17 +636,7 @@
 
   .col-novo { overflow: visible; z-index: 2; }
 
-  @keyframes card-travel {
-    0%,6%    { transform: translateX(0); opacity: 1; }
-    12%      { transform: translateX(0); opacity: .35; }
-    16%,26%  { transform: translateX(212px); opacity: 1; }
-    32%      { transform: translateX(212px); opacity: .35; }
-    36%,50%  { transform: translateX(424px); opacity: 1; }
-    56%      { transform: translateX(424px); opacity: .35; }
-    60%,82%  { transform: translateX(636px); opacity: 1; }
-    88%      { opacity: 0; transform: translateX(636px); }
-    94%,100% { transform: translateX(0); opacity: 0; }
-  }
+  /* card-travel keyframes injected by JS for responsive values */
 
   .kanban-caption {
     margin-top: 20px;
@@ -948,32 +938,16 @@
     }
     .product-body { padding: 20px 22px 28px; }
 
-    /* Kanban mobile: col 130px + gap 8px = 138px step */
-    .kanban-wrapper { padding: 20px 14px; }
-    .kanban-board { gap: 8px; }
-    .kanban-col {
-      flex: 0 0 130px;
-      padding: 10px 7px;
-      min-height: 130px;
-    }
-    .kanban-col-title { font-size: 7.5px; letter-spacing: .08em; gap: 4px; }
-    .kcard-ghost { height: 32px; margin-bottom: 5px; }
-    .kcard-live { padding: 8px 9px; }
-    .kcard-live .kname { font-size: 9.5px; }
-    .kcard-live .kmsg { font-size: 8px; }
-    .kcard-live .ai-tag { width: 15px; height: 15px; font-size: 7px; top: -5px; right: -5px; }
-
-    @keyframes card-travel {
-      0%,6%    { transform: translateX(0); opacity: 1; }
-      12%      { transform: translateX(0); opacity: .35; }
-      16%,26%  { transform: translateX(138px); opacity: 1; }
-      32%      { transform: translateX(138px); opacity: .35; }
-      36%,50%  { transform: translateX(276px); opacity: 1; }
-      56%      { transform: translateX(276px); opacity: .35; }
-      60%,82%  { transform: translateX(414px); opacity: 1; }
-      88%      { opacity: 0; transform: translateX(414px); }
-      94%,100% { transform: translateX(0); opacity: 0; }
-    }
+    .kanban-wrapper { padding: 18px 12px; }
+    .kanban-board { gap: 6px; }
+    .kanban-col { padding: 10px 6px; min-height: 120px; }
+    .kanban-col-title { font-size: 7px; letter-spacing: .06em; gap: 3px; margin-bottom: 8px; }
+    .kanban-col-title .dot { width: 4px; height: 4px; }
+    .kcard-ghost { height: 28px; margin-bottom: 4px; }
+    .kcard-live { padding: 7px 8px; }
+    .kcard-live .kname { font-size: 9px; }
+    .kcard-live .kmsg { font-size: 7.5px; }
+    .kcard-live .ai-tag { width: 14px; height: 14px; font-size: 7px; top: -4px; right: -4px; }
 
     .value-card { padding: 24px 18px; }
     .value-grid { grid-template-columns: 1fr; }
@@ -1000,25 +974,22 @@
     }
     .stat-item { padding: 20px 28px; }
 
+    .hero-inner h1 { font-size: clamp(30px, 8vw, 42px); }
+    .hero-sub { font-size: 14px; margin-bottom: 32px; }
+    .hero-actions { flex-direction: column; align-items: center; gap: 10px; }
+    .btn-primary, .btn-ghost { width: 100%; max-width: 300px; justify-content: center; }
+    .btn-whatsapp { padding: 16px 32px; font-size: 13px; width: 100%; max-width: 320px; justify-content: center; }
+
+    .section-header h2 { font-size: clamp(24px, 6vw, 36px); }
+    #cta h2 { font-size: clamp(26px, 6vw, 40px); }
+    #cta { padding: 72px 0 100px; }
+
+    .product-card h3 { font-size: 22px; }
+    .product-card .tagline { font-size: 11px; }
+
     footer { flex-direction: column; text-align: center; gap: 8px; }
   }
 
-  /* Tablet kanban adjustment */
-  @media (min-width: 641px) and (max-width: 900px) {
-    .kanban-col { flex: 0 0 170px; }
-    /* 170 + 12 gap = 182 */
-    @keyframes card-travel {
-      0%,6%    { transform: translateX(0); opacity: 1; }
-      12%      { transform: translateX(0); opacity: .35; }
-      16%,26%  { transform: translateX(182px); opacity: 1; }
-      32%      { transform: translateX(182px); opacity: .35; }
-      36%,50%  { transform: translateX(364px); opacity: 1; }
-      56%      { transform: translateX(364px); opacity: .35; }
-      60%,82%  { transform: translateX(546px); opacity: 1; }
-      88%      { opacity: 0; transform: translateX(546px); }
-      94%,100% { transform: translateX(0); opacity: 0; }
-    }
-  }
 </style>
 </head>
 <body>
@@ -1036,7 +1007,7 @@
     <div class="hero-inner">
       <span class="badge">Exclusivo para clientes AIOS CRM</span>
 
-      <h1>SmileSkin, enquanto<br>você atende — <em>a IA está vendendo.</em></h1>
+      <h1>SmileSkin, enquanto você atende — <em>a IA está vendendo.</em></h1>
 
       <p class="hero-sub">Gestor dedicado + Kanban automático por IA. Seu CRM sempre organizado. Seus leads sempre avançando. <strong style="color:var(--gold-light)">Você só fecha.</strong></p>
 
@@ -1062,7 +1033,7 @@
   <div class="container">
     <div class="reveal">
       <div class="divider"></div>
-      <h2>O que acontece quando<br>o CRM não tem dono?</h2>
+      <h2>O que acontece quando o CRM não tem dono?</h2>
       <p class="intro">Leads somem. Follow-ups atrasam. O pipeline vira um depósito de oportunidades esquecidas.</p>
     </div>
 
@@ -1099,7 +1070,7 @@
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">A solução</span>
-      <h2>Dois produtos.<br>Uma operação autônoma.</h2>
+      <h2>Dois produtos. Uma operação autônoma.</h2>
       <p>Juntos, o Gestor de CRM e o CRM Invisível garantem que nenhum lead seja perdido — e que sua equipe só precise fechar.</p>
     </div>
 
@@ -1233,7 +1204,7 @@
   <div class="container">
     <div class="section-header reveal">
       <span class="eyebrow">O que está incluso</span>
-      <h2>Tudo que a SmileSkin<br>recebe por R$ 3.200/mês</h2>
+      <h2>Tudo que a SmileSkin recebe por R$ 3.200/mês</h2>
     </div>
 
     <div class="value-card reveal">
@@ -1358,6 +1329,47 @@
       ticking = true;
     }
   }, { passive: true });
+
+  // Kanban animation — measures actual column width + gap, injects keyframes
+  function setupKanban() {
+    var cols = document.querySelectorAll('.kanban-col');
+    var card = document.querySelector('.kcard-live');
+    if (!cols.length || !card) return;
+
+    var colRect = cols[0].getBoundingClientRect();
+    var col2Rect = cols[1].getBoundingClientRect();
+    var step = col2Rect.left - colRect.left;
+
+    var s1 = Math.round(step);
+    var s2 = Math.round(step * 2);
+    var s3 = Math.round(step * 3);
+
+    var style = document.getElementById('kanban-anim');
+    if (style) style.remove();
+
+    style = document.createElement('style');
+    style.id = 'kanban-anim';
+    style.textContent =
+      '@keyframes card-travel {' +
+      '0%,6%{transform:translateX(0);opacity:1}' +
+      '12%{transform:translateX(0);opacity:.3}' +
+      '16%,26%{transform:translateX(' + s1 + 'px);opacity:1}' +
+      '32%{transform:translateX(' + s1 + 'px);opacity:.3}' +
+      '36%,50%{transform:translateX(' + s2 + 'px);opacity:1}' +
+      '56%{transform:translateX(' + s2 + 'px);opacity:.3}' +
+      '60%,82%{transform:translateX(' + s3 + 'px);opacity:1}' +
+      '88%{opacity:0;transform:translateX(' + s3 + 'px)}' +
+      '94%,100%{transform:translateX(0);opacity:0}' +
+      '}';
+    document.head.appendChild(style);
+    card.style.animation = 'card-travel 7s ease-in-out infinite';
+  }
+
+  setupKanban();
+  window.addEventListener('resize', function() {
+    clearTimeout(window._kanbanTimer);
+    window._kanbanTimer = setTimeout(setupKanban, 200);
+  });
 </script>
 
 </body>
